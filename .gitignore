@@ -35,3 +35,15 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Ja'Map local config & secrets (never commit) ###
+src/main/resources/application-dev.properties
+src/main/resources/application-local.properties
+*firebase*.json
+*service-account*.json
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+.DS_Store

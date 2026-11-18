@@ -1,0 +1,15 @@
+# Copia este archivo como application-dev.properties (ignorado por Git)
+# y completa tus credenciales locales.
+
+# Base de datos PostgreSQL local (Postgres.app)
+spring.datasource.url=jdbc:postgresql://localhost:5432/jamap_db
+spring.datasource.username=TU_USUARIO_POSTGRES
+spring.datasource.password=TU_CONTRASENA_POSTGRES
+
+# Hibernate actualiza el esquema automaticamente en desarrollo
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+# Firebase Admin SDK (se usara a partir de la Fase B4)
+# Ruta al JSON de cuenta de servicio descargado de Firebase Console (nunca subir a Git)
+app.firebase.credentials-path=classpath:firebase-service-account.json
