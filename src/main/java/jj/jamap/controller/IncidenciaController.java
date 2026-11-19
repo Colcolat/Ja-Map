@@ -1,13 +1,16 @@
 package jj.jamap.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import jj.jamap.domain.enums.EstadoIncidencia;
 import jj.jamap.domain.enums.TipoIncidencia;
 import jj.jamap.dto.ActualizarIncidenciaRequest;
+import jj.jamap.dto.IncidenciaCercanaResponse;
 import jj.jamap.dto.IncidenciaDetalleResponse;
 import jj.jamap.dto.IncidenciaResumenResponse;
 import jj.jamap.dto.PageResponse;
 import jj.jamap.service.IncidenciaService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -31,9 +34,14 @@ public class IncidenciaController {
     private static final int MAX_PAGE_SIZE = 100;
 
     private final IncidenciaService incidenciaService;
+    private final double radioPorDefecto;
 
-    public IncidenciaController(IncidenciaService incidenciaService) {
+    public IncidenciaController(
+            IncidenciaService incidenciaService,
+            @Value("${app.dedup.radio-metros:50}") double radioPorDefecto
+    ) {
         this.incidenciaService = incidenciaService;
+        this.radioPorDefecto = radioPorDefecto;
     }
 
     @GetMapping
@@ -53,6 +61,17 @@ public class IncidenciaController {
         );
         Pageable pageable = PageRequest.of(paginaValida, tamanoValido, ordenPorDefecto);
         return ResponseEntity.ok(incidenciaService.listar(tipo, estado, colonia, q, pageable));
+    }
+
+    @GetMapping("/cercanas")
+    public ResponseEntity<List<IncidenciaCercanaResponse>> buscarCercanas(
+            @RequestParam double lat,
+            @RequestParam double lng,
+            @RequestParam(required = false) Double radio,
+            @RequestParam(required = false) TipoIncidencia tipo
+    ) {
+        double radioEfectivo = radio != null ? radio : radioPorDefecto;
+        return ResponseEntity.ok(incidenciaService.buscarCercanas(lat, lng, radioEfectivo, tipo));
     }
 
     @GetMapping("/{id}")
