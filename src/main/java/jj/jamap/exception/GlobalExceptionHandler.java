@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -81,6 +82,15 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiError> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+        String message = "Parámetro inválido '" + ex.getName() + "': valor '" + ex.getValue() + "' no reconocido.";
+        return buildError(HttpStatus.BAD_REQUEST, message, request);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
