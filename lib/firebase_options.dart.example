@@ -1,0 +1,12 @@
+import 'package:firebase_core/firebase_core.dart';
+
+// Copia este archivo como lib/firebase_options.dart (ignorado por Git)
+// y coloca las credenciales de tu proyecto de Firebase.
+const FirebaseOptions firebaseOptions = FirebaseOptions(
+  apiKey: 'TU_FIREBASE_API_KEY',
+  authDomain: 'tu-proyecto.firebaseapp.com',
+  projectId: 'tu-proyecto',
+  storageBucket: 'tu-proyecto.firebasestorage.app',
+  messagingSenderId: '000000000000',
+  appId: '1:000000000000:web:0000000000000000000000',
+);
