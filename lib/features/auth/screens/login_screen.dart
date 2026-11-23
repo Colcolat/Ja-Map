@@ -611,7 +611,7 @@ class _WaveRevealItem extends StatelessWidget {
   }
 }
 
-/// Ola gradiente de agua que barre la pantalla al abrir la app revelando el Login.
+/// Ola gradiente 100% ASCII que barre la pantalla al abrir la app revelando el Login.
 class _WaterWaveIntroPainter extends CustomPainter {
   final double progress;
 
@@ -619,86 +619,102 @@ class _WaterWaveIntroPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // La cresta barre de arriba hacia abajo revelando los elementos detras de ella
     final eased = Curves.easeInOutCubic.transform(progress);
-    final waveY = size.height * (eased * 1.32 - 0.12);
-    final fade = (1.0 - ((progress - 0.65) / 0.35).clamp(0.0, 1.0));
+    final waveY = size.height * (eased * 1.28 - 0.10);
+    final fade = (1.0 - ((progress - 0.72) / 0.28).clamp(0.0, 1.0));
+    if (fade <= 0.01) return;
 
-    // Capa trasera (agua profunda)
-    _drawWaveBand(
-      canvas,
-      size,
-      baseY: waveY + 18,
-      amp: 18,
-      freq: 1.8,
-      phase: progress * 6.0,
-      colors: [
-        const Color(0xFF0C4A6E).withValues(alpha: 0.72 * fade),
-        const Color(0xFF061010).withValues(alpha: 0.94 * fade),
-      ],
-    );
+    const cellW = 10.5;
+    const cellH = 14.0;
+    final cols = (size.width / cellW).ceil();
+    final rows = (size.height / cellH).ceil();
 
-    // Capa media (gradiente turquesa/jade)
-    _drawWaveBand(
-      canvas,
-      size,
-      baseY: waveY + 6,
-      amp: 14,
-      freq: 2.3,
-      phase: progress * 7.5 + 1.4,
-      colors: [
-        const Color(0xFF0D9488).withValues(alpha: 0.55 * fade),
-        const Color(0xFF082F49).withValues(alpha: 0.88 * fade),
-      ],
-    );
-
-    // Cresta luminosa de espuma agua
-    final crestPath = Path();
-    for (double x = 0; x <= size.width; x += 6) {
-      final y = waveY +
-          math.sin((x / size.width) * math.pi * 2.4 + progress * 8.0) * 11 +
-          math.cos((x / size.width) * math.pi * 4.2 - progress * 5.0) * 4;
-      if (x == 0) {
-        crestPath.moveTo(x, y);
-      } else {
-        crestPath.lineTo(x, y);
-      }
+    // 1. Velo oscuro debajo de la cresta para que los elementos emerjan detras de la ola
+    final maskPath = Path()..moveTo(0, size.height);
+    for (double x = 0; x <= size.width; x += 10) {
+      final y = _crestAt(x, size.width, waveY);
+      maskPath.lineTo(x, y);
     }
-    canvas.drawPath(
-      crestPath,
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.6
-        ..color = const Color(0xFF5EEAD4).withValues(alpha: 0.85 * fade),
-    );
-  }
-
-  void _drawWaveBand(
-    Canvas canvas,
-    Size size, {
-    required double baseY,
-    required double amp,
-    required double freq,
-    required double phase,
-    required List<Color> colors,
-  }) {
-    final path = Path()..moveTo(0, size.height);
-    for (double x = 0; x <= size.width; x += 8) {
-      final y = baseY + math.sin((x / size.width) * math.pi * freq + phase) * amp;
-      path.lineTo(x, y);
-    }
-    path
+    maskPath
       ..lineTo(size.width, size.height)
       ..close();
+    canvas.drawPath(
+      maskPath,
+      Paint()..color = const Color(0xFF061010).withValues(alpha: 0.94 * fade),
+    );
 
-    final rect = Rect.fromLTWH(0, math.max(0, baseY - amp), size.width, size.height);
-    final paint = Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: colors,
-      ).createShader(rect);
-    canvas.drawPath(path, paint);
+    // 2. Gradiente de caracteres ASCII desde la espuma luminosa hasta el fondo marino
+    final style = const TextStyle(
+      fontFamily: 'monospace',
+      fontFamilyFallback: ['Menlo', 'Courier New'],
+      fontSize: 12,
+      height: 1.0,
+      fontWeight: FontWeight.w600,
+    );
+    final cache = <String, TextPainter>{};
+
+    TextPainter glyph(String ch, Color color) {
+      final key = '${ch}_${color.toARGB32()}';
+      return cache.putIfAbsent(key, () {
+        return TextPainter(
+          text: TextSpan(text: ch, style: style.copyWith(color: color)),
+          textDirection: TextDirection.ltr,
+        )..layout();
+      });
+    }
+
+    final cFoam = const Color(0xFFA5F3FC).withValues(alpha: 0.95 * fade);
+    final cCrest = const Color(0xFF5EEAD4).withValues(alpha: 0.90 * fade);
+    final cShallow = const Color(0xFF14B8A6).withValues(alpha: 0.78 * fade);
+    final cMid = const Color(0xFF0E7490).withValues(alpha: 0.68 * fade);
+    final cDeep = const Color(0xFF164E63).withValues(alpha: 0.50 * fade);
+    final cAbyss = const Color(0xFF173130).withValues(alpha: 0.42 * fade);
+
+    for (int c = 0; c < cols; c++) {
+      final x = c * cellW;
+      final crestY = _crestAt(x, size.width, waveY);
+      final startRow = ((crestY - cellH) / cellH).floor().clamp(0, rows - 1);
+
+      for (int r = startRow; r < rows; r++) {
+        final y = r * cellH;
+        final dy = y - crestY;
+
+        String ch;
+        Color color;
+        if (dy < -2) {
+          // Chispas de espuma justo encima de la cresta
+          if ((c + (progress * 24).floor()) % 5 != 0) continue;
+          ch = c.isEven ? '°' : '*';
+          color = cFoam;
+        } else if (dy < 14) {
+          ch = (c + r).isEven ? '~' : '^';
+          color = cCrest;
+        } else if (dy < 36) {
+          ch = (c % 3 == 0) ? '≈' : '~';
+          color = cShallow;
+        } else if (dy < 72) {
+          ch = ((c + r) % 2 == 0) ? '=' : '-';
+          color = cMid;
+        } else if (dy < 120) {
+          ch = ((c + r) % 3 == 0) ? '%' : ':';
+          color = cDeep;
+        } else {
+          if ((c + r) % 2 != 0) continue;
+          ch = ((c * 3 + r) % 5 == 0) ? '~' : '·';
+          color = cAbyss;
+        }
+
+        final tp = glyph(ch, color);
+        tp.paint(canvas, Offset(x, y));
+      }
+    }
+  }
+
+  double _crestAt(double x, double width, double waveY) {
+    final nx = x / width;
+    return waveY +
+        math.sin(nx * math.pi * 2.5 + progress * 8.5) * 14 +
+        math.cos(nx * math.pi * 4.2 - progress * 5.0) * 5;
   }
 
   @override
