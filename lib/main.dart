@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
+import 'features/auth/screens/login_screen.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -20,12 +21,7 @@ class JaMapApp extends StatelessWidget {
       title: 'Ja’Map',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: homeOverride ??
-          const Scaffold(
-            body: Center(
-              child: Text('Ja’Map — Base lista para Login y Catálogo'),
-            ),
-          ),
+      home: homeOverride ?? const LoginScreen(),
     );
   }
 }
