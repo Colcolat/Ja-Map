@@ -92,6 +92,9 @@ public class IncidenciaService {
         incidencia.setCostoEstimado(request.costoEstimado());
         incidencia.setAsignadoA(request.asignadoA());
         incidencia.setFotoEvidenciaUrl(request.fotoEvidenciaUrl());
+        if (request.imageUrl() != null) {
+            incidencia.setImageUrl(request.imageUrl());
+        }
 
         if (request.estado() == EstadoIncidencia.CERRADA && incidencia.getFechaCierre() == null) {
             incidencia.setFechaCierre(Instant.now());

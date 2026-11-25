@@ -123,7 +123,8 @@ class IncidenciaControllerIntegrationTest {
                   "prioridad": 80,
                   "costoEstimado": 3250.50,
                   "asignadoA": "cuadrilla-1",
-                  "fotoEvidenciaUrl": "https://example.com/evidencia.jpg"
+                  "fotoEvidenciaUrl": "https://example.com/evidencia.jpg",
+                  "imageUrl": "https://supabase.example.co/storage/v1/object/public/incidencias/fuga1.jpg"
                 }
                 """;
 
@@ -133,6 +134,7 @@ class IncidenciaControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("CERRADA"))
                 .andExpect(jsonPath("$.prioridad").value(80))
+                .andExpect(jsonPath("$.imageUrl").value("https://supabase.example.co/storage/v1/object/public/incidencias/fuga1.jpg"))
                 .andExpect(jsonPath("$.fechaCierre").isNotEmpty());
     }
 

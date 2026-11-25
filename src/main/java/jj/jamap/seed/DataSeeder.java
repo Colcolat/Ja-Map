@@ -286,6 +286,11 @@ public class DataSeeder implements CommandLineRunner {
         for (Reporte reporte : reportes) {
             incidencia.agregarReporte(reporte);
         }
+        if (fotoEvidenciaUrl != null && !fotoEvidenciaUrl.isBlank()) {
+            incidencia.setImageUrl(fotoEvidenciaUrl);
+        } else if (!reportes.isEmpty()) {
+            incidencia.setImageUrl(reportes.getFirst().getFotoUrl());
+        }
         incidencia.setPrioridad(IncidenciaService.calcularPrioridad(reportes.size(), apertura));
         return incidencia;
     }

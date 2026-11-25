@@ -24,6 +24,7 @@ public record IncidenciaResumenResponse(
         Integer prioridad,
         BigDecimal costoEstimado,
         String asignadoA,
+        String imageUrl,
         String fotoPrincipalUrl,
         int totalReportes,
         Instant fechaApertura,
@@ -47,6 +48,7 @@ public record IncidenciaResumenResponse(
                 incidencia.getCostoEstimado(),
                 incidencia.getAsignadoA(),
                 fotoPrincipal,
+                fotoPrincipal,
                 incidencia.getReportes().size(),
                 incidencia.getFechaApertura(),
                 incidencia.getFechaCierre()
@@ -54,6 +56,9 @@ public record IncidenciaResumenResponse(
     }
 
     private static String resolverFotoPrincipal(Incidencia incidencia) {
+        if (incidencia.getImageUrl() != null && !incidencia.getImageUrl().isBlank()) {
+            return incidencia.getImageUrl();
+        }
         if (incidencia.getFotoEvidenciaUrl() != null && !incidencia.getFotoEvidenciaUrl().isBlank()) {
             return incidencia.getFotoEvidenciaUrl();
         }

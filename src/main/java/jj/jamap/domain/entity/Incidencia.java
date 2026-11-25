@@ -68,6 +68,9 @@ public class Incidencia {
     @Column(name = "foto_evidencia_url", length = 500)
     private String fotoEvidenciaUrl;
 
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
     @Column(name = "fecha_apertura", nullable = false)
     private Instant fechaApertura;
 
@@ -219,6 +222,14 @@ public class Incidencia {
 
     public void setFotoEvidenciaUrl(String fotoEvidenciaUrl) {
         this.fotoEvidenciaUrl = fotoEvidenciaUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Instant getFechaApertura() {

@@ -54,5 +54,8 @@ public record ActualizarIncidenciaRequest(
         String asignadoA,
 
         @Size(max = 500, message = "La URL de evidencia no puede exceder 500 caracteres.")
-        String fotoEvidenciaUrl
+        String fotoEvidenciaUrl,
+
+        @Size(max = 500, message = "La URL de imagen no puede exceder 500 caracteres.")
+        String imageUrl
 ) {}

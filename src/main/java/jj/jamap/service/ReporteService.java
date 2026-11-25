@@ -68,6 +68,10 @@ public class ReporteService {
                     )
             );
             existente.agregarReporte(nuevoReporte);
+            if ((existente.getImageUrl() == null || existente.getImageUrl().isBlank())
+                    && request.fotoUrl() != null && !request.fotoUrl().isBlank()) {
+                existente.setImageUrl(request.fotoUrl());
+            }
             IncidenciaService.recalcularMetricas(existente);
             Incidencia guardada = incidenciaRepository.saveAndFlush(existente);
 
@@ -122,6 +126,7 @@ public class ReporteService {
         incidencia.setCruzamiento1(request.cruzamiento1());
         incidencia.setCruzamiento2(request.cruzamiento2());
         incidencia.setColonia(request.colonia());
+        incidencia.setImageUrl(request.fotoUrl());
         incidencia.setFechaApertura(Instant.now());
         return incidencia;
     }
