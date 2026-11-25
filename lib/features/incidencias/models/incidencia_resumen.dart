@@ -13,6 +13,7 @@ class IncidenciaResumen {
   final int prioridad;
   final double? costoEstimado;
   final String? asignadoA;
+  final String? imageUrl;
   final String? fotoPrincipalUrl;
   final int totalReportes;
   final DateTime? fechaApertura;
@@ -32,6 +33,7 @@ class IncidenciaResumen {
     required this.prioridad,
     this.costoEstimado,
     this.asignadoA,
+    this.imageUrl,
     this.fotoPrincipalUrl,
     required this.totalReportes,
     this.fechaApertura,
@@ -39,6 +41,8 @@ class IncidenciaResumen {
   });
 
   factory IncidenciaResumen.fromJson(Map<String, dynamic> json) {
+    final resolvedImage =
+        (json['imageUrl'] as String?) ?? (json['fotoPrincipalUrl'] as String?);
     return IncidenciaResumen(
       id: (json['id'] as num).toInt(),
       tipo: (json['tipo'] ?? 'FUGA_VIA_PUBLICA').toString(),
@@ -53,7 +57,8 @@ class IncidenciaResumen {
       prioridad: (json['prioridad'] as num?)?.toInt() ?? 0,
       costoEstimado: (json['costoEstimado'] as num?)?.toDouble(),
       asignadoA: json['asignadoA'] as String?,
-      fotoPrincipalUrl: json['fotoPrincipalUrl'] as String?,
+      imageUrl: resolvedImage,
+      fotoPrincipalUrl: resolvedImage,
       totalReportes: (json['totalReportes'] as num?)?.toInt() ?? 0,
       fechaApertura: json['fechaApertura'] != null
           ? DateTime.tryParse(json['fechaApertura'].toString())
@@ -117,6 +122,11 @@ class IncidenciaResumen {
       partes.add(colonia!.trim());
     }
     return partes.isEmpty ? 'Dirección sin especificar' : partes.join(', ');
+  }
+
+  String? get costoFormateado {
+    if (costoEstimado == null) return null;
+    return '\$${costoEstimado!.toStringAsFixed(0)} MXN';
   }
 
   bool get esPrioridadAlta => prioridad >= 50;

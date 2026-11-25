@@ -96,11 +96,11 @@ void main() {
   });
 
   group('SignUpScreen', () {
-    testWidgets('rechaza correo no institucional y contrasena debil con errores por campo', (tester) async {
+    testWidgets('rechaza correo invalido y contrasena debil con errores por campo', (tester) async {
       await tester.pumpWidget(const MaterialApp(home: SignUpScreen()));
 
       final fields = find.byType(TextField);
-      await tester.enterText(fields.at(0), 'usuario@gmail.com');
+      await tester.enterText(fields.at(0), 'correo-invalido');
       await tester.enterText(fields.at(1), '12345');
       await tester.enterText(fields.at(2), '54321');
 
@@ -109,8 +109,8 @@ void main() {
       await tester.pump();
 
       expect(
-        find.textContaining('@tecdesoftware.edu.mx'),
-        findsWidgets,
+        find.text('Ingresa un correo electrónico válido.'),
+        findsOneWidget,
       );
       expect(find.text('Las contraseñas no coinciden.'), findsOneWidget);
     });
@@ -146,7 +146,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final fields = find.byType(TextField);
-      await tester.enterText(fields.at(0), 'ana.pech@tecdesoftware.edu.mx');
+      await tester.enterText(fields.at(0), 'ana.pech@gmail.com');
       await tester.enterText(fields.at(1), 'JaMap2026!');
       await tester.enterText(fields.at(2), 'JaMap2026!');
 
@@ -154,7 +154,7 @@ void main() {
       await tester.tap(find.text('Registrarme'));
       await tester.pumpAndSettle();
 
-      expect(registeredEmail, 'ana.pech@tecdesoftware.edu.mx');
+      expect(registeredEmail, 'ana.pech@gmail.com');
       expect(find.text('Ir a registro'), findsOneWidget);
     });
   });

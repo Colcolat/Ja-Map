@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../utils/auth_validators.dart';
 
-/// Pantalla de registro con validaciones por campo, reglas visibles de contrasena
-/// y correo institucional obligatorio (@tecdesoftware.edu.mx).
+/// Pantalla de registro con validaciones por campo y reglas visibles de contrasena,
+/// armonizada con la estetica oscura estanque/ASCII de Ja'Map.
 class SignUpScreen extends StatefulWidget {
   final Future<void> Function(String email, String password)? onSignUp;
 
@@ -14,6 +14,16 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  static const Color _pondBg = Color(0xFF061010);
+  static const Color _cardBg = Color(0xFF0B1C1C);
+  static const Color _borderIdle = Color(0xFF234D4B);
+  static const Color _borderFocus = Color(0xFF5EEAD4);
+  static const Color _accentAqua = Color(0xFF5EEAD4);
+  static const Color _accentJade = Color(0xFF0D9488);
+  static const Color _textLight = Color(0xFFE2E8F0);
+  static const Color _textMuted = Color(0xFF7FA6A4);
+  static const Color _errorRed = Color(0xFFF87171);
+
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _confirmPassCtrl = TextEditingController();
@@ -36,10 +46,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     String? confirmErr;
 
     if (email.isEmpty) {
-      emailErr = 'Ingresa tu correo institucional.';
-    } else if (!AuthValidators.isInstitutionalEmail(email)) {
-      emailErr =
-          'Usa un correo institucional terminado en ${AuthValidators.institutionalDomain}.';
+      emailErr = 'Ingresa tu correo electrónico.';
+    } else if (!AuthValidators.isBasicEmail(email)) {
+      emailErr = 'Ingresa un correo electrónico válido.';
     }
 
     if (pass.isEmpty) {
@@ -85,8 +94,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cuenta creada correctamente. Ya puedes iniciar sesión.'),
-          backgroundColor: Color(0xFF15803D),
+          content: Text(
+            'Cuenta creada correctamente. Ya puedes iniciar sesión.',
+            style: TextStyle(fontFamily: 'monospace'),
+          ),
+          backgroundColor: Color(0xFF14532D),
         ),
       );
       Navigator.pop(context);
@@ -99,14 +111,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _ => 'No se pudo completar el registro. Intenta de nuevo.',
       };
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message), backgroundColor: Colors.red.shade700),
+        SnackBar(
+          content: Text(message, style: const TextStyle(fontFamily: 'monospace')),
+          backgroundColor: const Color(0xFF991B1B),
+        ),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Ocurrió un error al registrar tu cuenta.'),
-          backgroundColor: Colors.red.shade700,
+        const SnackBar(
+          content: Text(
+            'Ocurrió un error al registrar tu cuenta.',
+            style: TextStyle(fontFamily: 'monospace'),
+          ),
+          backgroundColor: Color(0xFF991B1B),
         ),
       );
     } finally {
@@ -114,6 +132,43 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  InputDecoration _darkFieldDecoration({
+    required String label,
+    required String hint,
+    required IconData icon,
+    String? errorText,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      labelStyle: const TextStyle(color: _textMuted, fontFamily: 'monospace', fontSize: 13),
+      hintStyle: const TextStyle(color: Color(0xFF4F7371), fontFamily: 'monospace', fontSize: 13),
+      errorText: errorText,
+      errorStyle: const TextStyle(color: _errorRed, fontFamily: 'monospace', fontSize: 11.5),
+      prefixIcon: Icon(icon, color: _accentAqua, size: 19),
+      suffixIcon: suffixIcon,
+      filled: true,
+      fillColor: _cardBg,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _borderIdle),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _borderFocus, width: 1.4),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _errorRed),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: _errorRed, width: 1.4),
+      ),
+    );
   }
 
   @override
@@ -129,38 +184,66 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final pass = _passCtrl.text;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear cuenta')),
+      backgroundColor: _pondBg,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF0A1717),
+        foregroundColor: _textLight,
+        title: const Text(
+          '> Crear cuenta',
+          style: TextStyle(
+            fontFamily: 'monospace',
+            color: _accentAqua,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: _borderIdle),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Únete a Ja’Map',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+              const Text(
+                '[ ÚNETE A JA’MAP ]',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  color: _accentAqua,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
               ),
               const SizedBox(height: 6),
-              Text(
-                'Regístrate con tu correo institucional (${AuthValidators.institutionalDomain}).',
-                style: Theme.of(context).textTheme.bodyMedium,
+              const Text(
+                'Crea tu cuenta con tu correo electrónico y una contraseña segura.',
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  color: _textMuted,
+                  fontSize: 12.5,
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 20),
 
-              // Correo institucional
+              // Correo electrónico
               TextField(
                 controller: _emailCtrl,
                 keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
+                style: const TextStyle(color: _textLight, fontFamily: 'monospace', fontSize: 14),
+                cursorColor: _accentAqua,
                 onChanged: (_) {
                   if (_emailError != null) setState(() => _emailError = null);
                 },
-                decoration: InputDecoration(
-                  labelText: 'Correo institucional',
-                  hintText: 'nombre@tecdesoftware.edu.mx',
-                  prefixIcon: const Icon(Icons.email_outlined),
+                decoration: _darkFieldDecoration(
+                  label: 'Correo electrónico',
+                  hint: 'ejemplo@correo.com',
+                  icon: Icons.email_outlined,
                   errorText: _emailError,
                 ),
               ),
@@ -171,14 +254,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _passCtrl,
                 obscureText: _isObscurePass,
                 textInputAction: TextInputAction.next,
+                style: const TextStyle(color: _textLight, fontFamily: 'monospace', fontSize: 14),
+                cursorColor: _accentAqua,
                 onChanged: (_) => setState(() => _passError = null),
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  prefixIcon: const Icon(Icons.lock_outline),
+                decoration: _darkFieldDecoration(
+                  label: 'Contraseña',
+                  hint: 'Mínimo 8 caracteres',
+                  icon: Icons.lock_outline,
                   errorText: _passError,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isObscurePass ? Icons.visibility : Icons.visibility_off,
+                      color: _textMuted,
+                      size: 19,
                     ),
                     onPressed: () {
                       setState(() => _isObscurePass = !_isObscurePass);
@@ -192,18 +280,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blueGrey.shade100),
+                  color: _cardBg,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: _borderIdle),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Tu contraseña debe incluir:',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      '+--[ REGLAS DE CONTRASEÑA ]--+',
+                      style: TextStyle(
+                        fontFamily: 'monospace',
+                        color: _accentAqua,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11.5,
+                      ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     _PasswordRuleRow(
                       label: 'Mínimo 8 caracteres',
                       met: AuthValidators.hasMinLength(pass),
@@ -234,17 +327,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _confirmPassCtrl,
                 obscureText: _isObscureConfirm,
                 textInputAction: TextInputAction.done,
+                style: const TextStyle(color: _textLight, fontFamily: 'monospace', fontSize: 14),
+                cursorColor: _accentAqua,
                 onChanged: (_) {
                   if (_confirmError != null) setState(() => _confirmError = null);
                 },
                 onSubmitted: (_) => _isLoading ? null : _onSubmit(),
-                decoration: InputDecoration(
-                  labelText: 'Confirmar contraseña',
-                  prefixIcon: const Icon(Icons.lock_reset_outlined),
+                decoration: _darkFieldDecoration(
+                  label: 'Confirmar contraseña',
+                  hint: 'Repite tu contraseña',
+                  icon: Icons.lock_reset_outlined,
                   errorText: _confirmError,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isObscureConfirm ? Icons.visibility : Icons.visibility_off,
+                      color: _textMuted,
+                      size: 19,
                     ),
                     onPressed: () {
                       setState(() => _isObscureConfirm = !_isObscureConfirm);
@@ -255,8 +353,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const SizedBox(height: 22),
 
               SizedBox(
-                height: 50,
+                height: 48,
                 child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _accentJade,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                      side: const BorderSide(color: _borderFocus, width: 1.2),
+                    ),
+                  ),
                   onPressed: _isLoading ? null : _onSubmit,
                   child: _isLoading
                       ? const SizedBox(
@@ -269,7 +375,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         )
                       : const Text(
                           'Registrarme',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontFamily: 'monospace',
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          ),
                         ),
                 ),
               ),
@@ -289,21 +400,25 @@ class _PasswordRuleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = met ? const Color(0xFF15803D) : Colors.blueGrey.shade500;
+    final color = met ? const Color(0xFF4ADE80) : const Color(0xFF7FA6A4);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 2.5),
       child: Row(
         children: [
           Icon(
             met ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
-            size: 16,
+            size: 15,
             color: color,
           ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               label,
-              style: TextStyle(fontSize: 12.5, color: color),
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 12,
+                color: color,
+              ),
             ),
           ),
         ],
